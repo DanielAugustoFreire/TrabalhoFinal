@@ -29,8 +29,11 @@
             
              </section>   
 
-            <form class="chat_formulario">
-                <input type="text" class="chat_input" placeholder="Digite uma Mensagem" required>
+            <form action="/enviarmensagem" method="POST" class="chat_formulario">
+                <select name="user" id="user">
+                    <option value="" disabled selected>Selecione um usuário</option>
+                </select>
+                <input type="text" class="chat_input" placeholder="Digite uma Mensagem" name="message">
                 <button type="submit" class="chat_button">
                     <span class="material-symbols-outlined">
                         send
