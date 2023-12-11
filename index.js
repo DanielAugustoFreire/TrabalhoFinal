@@ -390,7 +390,7 @@ app.get(`/batepapo`, (req,res) => {
                         {
                             conteudo += `<option value="${users.nickname}">${users.nickname}</option>`
                         }
-
+ 
                     
                     conteudo +=     `</select>
                     <input type="text" class="chat_input" placeholder="Digite uma Mensagem" name="message" required>
