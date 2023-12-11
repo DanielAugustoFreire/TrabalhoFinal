@@ -15,11 +15,216 @@ app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(process.cwd(),`src`)));
 
+function autenticar(requisicao, resposta, next){
+    if (requisicao.session.usuarioAutenticado){
+        next();
+    }
+    else{
+        resposta.redirect("/login");
+    }
+}
+
+app.use(session({
+    secret:"secreta",
+    resave: true, 
+    saveUninitialized: true,
+    cookie: {
+        maxAge: 1000 * 60 * 15 
+    }
+}));
+
+
 const cores = ['#FFD700', '#008080', '#008B8B', '#FF8C00', '#D3D3D3'];
 
 var contador_cores = 0;
 
-app.post(`/cadastrarusuario`, (req,res) => {
+app.get(`/login`, (req, res) => {
+    res.end(`
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Login</title>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                background-color: #f8f9fa;
+                margin: 0;
+                padding: 0;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                height: 100vh;
+            }
+    
+            .container {
+                background-color: #fff;
+                padding: 20px;
+                border-radius: 8px;
+                box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+                text-align: center;
+            }
+
+            form {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+            }
+
+            label {
+                margin-bottom: 10px;
+            }
+
+            input {
+                width: 100%;
+                padding: 8px;
+                margin-bottom: 15px;
+                box-sizing: border-box;
+            }
+
+            button {
+                padding: 10px;
+                background-color: #007bff;
+                color: #fff;
+                border: none;
+                border-radius: 4px;
+                cursor: pointer;
+            }
+
+            button:hover {
+                background-color: #0056b3;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h2>Login</h2>
+            <form action="/auth" method="post">
+                <label for="usuario">Usuario:</label>
+                <input type="text" id="usuario" name="usuario" required>
+
+                <label for="senha">Senha:</label>
+                <input type="password" id="senha" name="senha" required>
+
+                <button type="submit">Entrar</button>
+            </form>
+        </div>
+    </body>
+    </html>
+    `);
+});
+
+
+app.post('/auth', (req, res)=>{
+    const user = req.body.usuario;
+    const pass = req.body.senha;
+    if (user && pass && (user === 'dan') && (pass === '123')){
+        req.session.usuarioAutenticado = true;
+        res.redirect('/');
+    }
+    else{
+        res.end(`
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Falha na autenticação</title>
+            <style>
+                body {
+                    font-family: Arial, sans-serif;
+                    background-color: #f8f9fa;
+                    margin: 0;
+                    padding: 0;
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    justify-content: center;
+                    height: 100vh;
+                }
+        
+                h3 {
+                    color: #dc3545;
+                }
+        
+                a {
+                    color: #007bff;
+                    text-decoration: none;
+                }
+        
+                a:hover {
+                    text-decoration: underline;
+                }
+        
+                .container {
+                    background-color: #fff;
+                    padding: 20px;
+                    border-radius: 8px;
+                    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+                    text-align: center;
+                }
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <h3>Usuário ou senha inválidos!</h3>
+                <a href="/login">Voltar ao login</a>
+            </div>
+        </body>
+        </html>
+        `);
+    }
+});
+
+app.get(`/cadastro`, autenticar, (req,res) => {
+    res.end(`<!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Document</title>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    </head>
+    <body style="display: flex;
+                padding: 10%;
+                justify-content: center;
+                "
+    >
+    
+    
+    
+        <div class="container bg-secondary p-md-5">  
+              
+            <form action="/cadastrarusuario" method="POST" novalidate>
+            <div class="form-group">
+              <label for="nome_completo">Nome Completo</label>
+              <input type="text" class="form-control" id="nome_completo" name="nome_completo">
+            </div>
+            <div class="form-group">
+                <label for="data_nascimento">Data de Nascimento</label>
+                <input type="date" class="form-control" id="data_nascimento" name="data_nascimento">
+                </div>
+                <div class="form-group">
+                    <label for="nick">NickName</label>
+                    <input type="text" class="form-control" id="nick" name="nick">
+            </div>
+    
+            <button type="submit" class="btn btn-primary">Enviar</button>
+          </form>
+    </div>
+    
+        <script>
+    
+        </script>
+    
+        <script src="https://st kpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+    </body>
+    </html>`);
+});
+
+app.post(`/cadastrarusuario`, autenticar, (req,res) => {
 
     var conteudo = ``
 
@@ -148,7 +353,7 @@ app.post(`/cadastrarusuario`, (req,res) => {
 
 });
 
-app.get(`/listar`, (req,res) => {
+app.get(`/listar`, autenticar, (req,res) => {
         let conteudo = `    <style>
     body {
         font-family: Arial, sans-serif;
@@ -218,7 +423,7 @@ conteudo+=
 `            </tbody>
                 </table>
                 <a href="/">Voltar ao menu</a>
-                <a href="/cadastro.html">Continuar cadastrando</a>
+                <a href="/cadastro">Continuar cadastrando</a>
             </body>
 `;
     
@@ -331,7 +536,7 @@ app.post(`/enviarmensagem`, (req,res) => {
     }
 });
 
-app.get(`/batepapo`, (req,res) => {
+app.get(`/batepapo`, autenticar, (req,res) => {
 
     var conteudo = ``;
 
@@ -390,7 +595,7 @@ app.get(`/batepapo`, (req,res) => {
                         {
                             conteudo += `<option value="${users.nickname}">${users.nickname}</option>`
                         }
- 
+                        
                     
                     conteudo +=     `</select>
                     <input type="text" class="chat_input" placeholder="Digite uma Mensagem" name="message" required>
@@ -418,8 +623,23 @@ app.get(`/batepapo`, (req,res) => {
     res.end(conteudo);
 });
 
+app.post(`/logout`, (req, res) => {
+    // Limpa a sessão e redireciona para a página de login
+    req.session.destroy((err) => {
+        if (err) {
+            console.error("Erro ao encerrar a sessão:", err);
+        }
+        res.redirect("/login");
+    });
+});
 
-app.get(`/`, (req,res) => {
+
+
+app.get(`/`, autenticar, (req,res) => {
+
+    const logoutButton = `<form action="/logout" method="post">
+                            <button type="submit">Sair</button>
+                          </form>`;
 
     const dataUltimoAcesso = req.cookies.DataUltimoAcesso || "Nunca acessado anteriormente";
     const data = new Date();
@@ -505,13 +725,15 @@ app.get(`/`, (req,res) => {
             <a href="/batepapo">
                 <i class="fas fa-comment"></i>
             </a>
-            <a href="cadastro.html">
+            <a href="cadastro">
                 <i class="fas fa-user-plus"></i>
             </a>
         </nav>
 
         <main>
         <h2 style="text-align: center;">Ultimo acesso em ${dataUltimoAcesso}</h2>
+
+        ${logoutButton}
         </main>
 
         <footer>
