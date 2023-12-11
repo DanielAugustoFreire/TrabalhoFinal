@@ -11,6 +11,7 @@ const PORT = 3000;
 var lista_usuarios = [];
 var lista_mensagens = [];
 
+app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(process.cwd(),`src`)));
 
@@ -227,6 +228,8 @@ res.end(conteudo);
 app.post(`/enviarmensagem`, (req,res) => {
 
     var conteudo = ``;
+    
+    const data = new Date();
 
     if(req.body.user == undefined)
     {
@@ -268,7 +271,7 @@ app.post(`/enviarmensagem`, (req,res) => {
                    <span style="color: ${pegar};" class="user">${message.usuario}</span>
                    
                                        
-                       ${message.mensagem}
+                   ${message.mensagem}<br><br><span class="data">${message.data}</span>
                    </div>      
                    `                   
                 }
@@ -287,7 +290,7 @@ app.post(`/enviarmensagem`, (req,res) => {
 
                         
                         conteudo +=     `</select>
-                        <input type="text" class="chat_input" placeholder="Digite uma Mensagem" name="message">
+                        <input type="text" class="chat_input" placeholder="Digite uma Mensagem" name="message" required>
                         <button type="submit" class="chat_button">
                             <span class="material-symbols-outlined">
                                 send
@@ -313,10 +316,14 @@ app.post(`/enviarmensagem`, (req,res) => {
     }
     else
     {
+
+        const data = new Date();
+
         const mensagem = {
             nicks: req.body.nick,
             mensagem: req.body.message,
-            usuario: req.body.user
+            usuario: req.body.user,
+            data: data.toLocaleString()
         }
         lista_mensagens.push(mensagem);
 
@@ -327,6 +334,8 @@ app.post(`/enviarmensagem`, (req,res) => {
 app.get(`/batepapo`, (req,res) => {
 
     var conteudo = ``;
+
+    const data = new Date();
 
 
     conteudo += `<!DOCTYPE html>
@@ -365,7 +374,7 @@ app.get(`/batepapo`, (req,res) => {
                     <span style="color: ${pegar};" class="user">${message.usuario}</span>
                     
                                         
-                        ${message.mensagem}
+                        ${message.mensagem}<br><br><span class="data">${message.data} </span>
                     </div>      
                     `                   
                  }
@@ -384,7 +393,7 @@ app.get(`/batepapo`, (req,res) => {
 
                     
                     conteudo +=     `</select>
-                    <input type="text" class="chat_input" placeholder="Digite uma Mensagem" name="message">
+                    <input type="text" class="chat_input" placeholder="Digite uma Mensagem" name="message" required>
                     <button type="submit" class="chat_button">
                         <span class="material-symbols-outlined">
                             send
@@ -411,6 +420,13 @@ app.get(`/batepapo`, (req,res) => {
 
 
 app.get(`/`, (req,res) => {
+
+    const dataUltimoAcesso = req.cookies.DataUltimoAcesso || "Nunca acessado anteriormente";
+    const data = new Date();
+    res.cookie("DataUltimoAcesso", data.toLocaleString(), {
+        maxAge: 1000 * 60 * 60 * 24 * 30,
+        httpOnly: true
+    })
 
     res.send(`<!DOCTY   PE html>
     <html lang="en">
@@ -495,7 +511,7 @@ app.get(`/`, (req,res) => {
         </nav>
 
         <main>
-            <!-- Conteúdo da página vai aqui -->
+        <h2 style="text-align: center;">Ultimo acesso em ${dataUltimoAcesso}</h2>
         </main>
 
         <footer>
