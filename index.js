@@ -14,6 +14,9 @@ var lista_mensagens = [];
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(process.cwd(),`src`)));
 
+const cores = ['#FFD700', '#008080', '#008B8B', '#FF8C00', '#D3D3D3'];
+
+var contador_cores = 0;
 
 app.post(`/cadastrarusuario`, (req,res) => {
 
@@ -43,7 +46,7 @@ app.post(`/cadastrarusuario`, (req,res) => {
                     "
         >
         
-            <div class="container bg-secondary p-md-5">    
+            <div class="container bg-secondary p-md-5">     
                 <form action="/cadastrarusuario" method="POST" novalidate>
                 <div class="form-group">
                 <label for="nome_completo">Nome Completo</label>
@@ -127,12 +130,16 @@ app.post(`/cadastrarusuario`, (req,res) => {
         res.send(conteudo);
     }
     else{
+        contador_cores = (contador_cores + 1) % cores.length;
+
         const usuario = {
             nome: req.body.nome_completo,
             data: req.body.data_nascimento,
-            nickname: req.body.nick
+            nickname: req.body.nick,
+            cor: cores[contador_cores++]
         }       
-        
+
+
         lista_usuarios.push(usuario);
 
         res.redirect(`/listar`);
@@ -141,60 +148,60 @@ app.post(`/cadastrarusuario`, (req,res) => {
 });
 
 app.get(`/listar`, (req,res) => {
-    let conteudo = `    <style>
-body {
-    font-family: Arial, sans-serif;
-}
+        let conteudo = `    <style>
+    body {
+        font-family: Arial, sans-serif;
+    }
 
-h1 {
-    color: #333; /* Altere a cor conforme necessário */
-}
+    h1 {
+        color: #333; /* Altere a cor conforme necessário */
+    }
 
-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 20px; /* Ajuste conforme necessário */
-}
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px; /* Ajuste conforme necessário */
+    }
 
-th, td {
-    border: 1px solid #ddd;
-    padding: 8px;
-    text-align: left;
-}
+    th, td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: left;
+    }
 
-th {
-    background-color: #f2f2f2; /* Cor de fundo para cabeçalho */
-}
+    th {
+        background-color: #f2f2f2; /* Cor de fundo para cabeçalho */
+    }
 
-/* Estilizar linhas alternadas */
-tbody tr:nth-child(even) {
-    background-color: #f9f9f9; /* Cor de fundo para linhas pares */
-}
-a {
-    display: inline-block;
-    padding: 10px;
-    margin-top: 10px; /* Ajuste conforme necessário */
-    text-decoration: none;
-    color: #fff; /* Cor do texto dos links */
-    background-color: #007bff; /* Cor de fundo dos links */
-    border-radius: 5px; /* Borda arredondada */
-    transition: background-color 0.3s ease; /* Efeito de transição suave */
-}
+    /* Estilizar linhas alternadas */
+    tbody tr:nth-child(even) {
+        background-color: #f9f9f9; /* Cor de fundo para linhas pares */
+    }
+    a {
+        display: inline-block;
+        padding: 10px;
+        margin-top: 10px; /* Ajuste conforme necessário */
+        text-decoration: none;
+        color: #fff; /* Cor do texto dos links */
+        background-color: #007bff; /* Cor de fundo dos links */
+        border-radius: 5px; /* Borda arredondada */
+        transition: background-color 0.3s ease; /* Efeito de transição suave */
+    }
 
-a:hover {
-    background-color: #0056b3; /* Cor de fundo ao passar o mouse */
-}
-</style> <body  style="font-family: Arial, sans-serif;">
-<h1>Lista de usuario cadastrados</h1>
-<table>
-    <thead>
-        <tr>
-            <th>Nome Completo</th>
-            <th>Data de Nascimento</th>
-            <th>Nickname</th>
-        </tr>
-    </thead>
-    <tbody> `;
+    a:hover {
+        background-color: #0056b3; /* Cor de fundo ao passar o mouse */
+    }
+    </style> <body  style="font-family: Arial, sans-serif;">
+    <h1>Lista de usuario cadastrados</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Nome Completo</th>
+                <th>Data de Nascimento</th>
+                <th>Nickname</th>
+            </tr>
+        </thead>
+        <tbody> `;
 
 for (const usuario of lista_usuarios){
     conteudo += `<tr>
@@ -208,10 +215,10 @@ app.use(express.static(path.join(process.cwd(),`src`)))
 
 conteudo+=
 `            </tbody>
-</table>
-<a href="/">Voltar ao menu</a>
-<a href="/cadastro.html">Continuar cadastrando</a>
-    </body>
+                </table>
+                <a href="/">Voltar ao menu</a>
+                <a href="/cadastro.html">Continuar cadastrando</a>
+            </body>
 `;
     
 res.end(conteudo);
@@ -244,15 +251,30 @@ app.post(`/enviarmensagem`, (req,res) => {
                 </div>
         
                 <section class="chat">
-                    
-                     <section class="chat_messages">
-        
-                        <div class="message">
-                            <span class="user">Daniel Augusto</span>                    
-                            Eu sou daniel augusto freire de almeida santana e desejo fazer parte dessa bagaca
-                        </div>     
-                    
-                     </section>   
+                
+                <section class="chat_messages">`
+                for(let message of lista_mensagens)
+                {
+                   for (let colorido of lista_usuarios) {
+                       if (message.usuario === colorido.nickname) {
+                           var pegar = `${colorido.cor}`;
+                           break;
+                       }
+                   }
+                   
+
+                   conteudo +=`
+                   <div class="message">
+                   <span style="color: ${pegar};" class="user">${message.usuario}</span>
+                   
+                                       
+                       ${message.mensagem}
+                   </div>      
+                   `                   
+                }
+
+               
+             conteudo += `</section> 
         
                     <form action="/enviarmensagem" method="POST" class="chat_formulario">
                         <select style="border: 1px solid red" name="user" id="user" onfocus="removeRedBorder()">
@@ -292,34 +314,20 @@ app.post(`/enviarmensagem`, (req,res) => {
     else
     {
         const mensagem = {
-            usuario: req.body.user,
-            mensagem: req.body.message
+            nicks: req.body.nick,
+            mensagem: req.body.message,
+            usuario: req.body.user
         }
-        console.log(mensagem)    
-        
-        
+        lista_mensagens.push(mensagem);
+
+        res.redirect(`/batepapo`);
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 });
 
 app.get(`/batepapo`, (req,res) => {
 
     var conteudo = ``;
+
 
     conteudo += `<!DOCTYPE html>
     <html lang="pt">
@@ -331,9 +339,6 @@ app.get(`/batepapo`, (req,res) => {
         <title>Zap-Zap</title>
     </head>
     <body>
-    
-    
-    
         <section class="container">
     
             <div class="menu">
@@ -343,14 +348,30 @@ app.get(`/batepapo`, (req,res) => {
     
             <section class="chat">
                 
-                 <section class="chat_messages">
-    
+                 <section class="chat_messages">`
+
+                 for(let message of lista_mensagens)
+                 {
+                    for (let colorido of lista_usuarios) {
+                        if (message.usuario === colorido.nickname) {
+                            var pegar = `${colorido.cor}`;
+                            break;
+                        }
+                    }
+                    
+
+                    conteudo +=`
                     <div class="message">
-                        <span class="user">Daniel Augusto</span>                    
-                        Eu sou daniel augusto freire de almeida santana e desejo fazer parte dessa bagaca
-                    </div>     
+                    <span style="color: ${pegar};" class="user">${message.usuario}</span>
+                    
+                                        
+                        ${message.mensagem}
+                    </div>      
+                    `                   
+                 }
+
                 
-                 </section>   
+              conteudo += `</section>   
     
                 <form action="/enviarmensagem" method="POST" class="chat_formulario">
                     <select  name="user" id="user" onfocus="removeRedBorder()">
