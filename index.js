@@ -299,7 +299,7 @@ app.get(`/batepapo`, autenticar, (req,res) => {
                         
                     
                     conteudo +=     `</select>
-                    <input type="text" class="chat_input" placeholder="Digite uma Mensagem" name="message" required>
+                    <input type="text" class="chat_input" placeholder="Digite uma Mensagem" name="message">
                     <button type="submit" class="chat_button">
                         <span class="material-symbols-outlined">
                             send
@@ -691,7 +691,7 @@ app.post(`/enviarmensagem`, (req,res) => {
 
                         
                         conteudo +=     `</select>
-                        <input type="text" class="chat_input" placeholder="Digite uma Mensagem" name="message" required>
+                        <input type="text" class="chat_input" placeholder="Digite uma Mensagem" name="message">
                         <button type="submit" class="chat_button">
                             <span class="material-symbols-outlined">
                                 send
@@ -709,6 +709,89 @@ app.post(`/enviarmensagem`, (req,res) => {
         
         function removeRedBorder() {
             document.getElementById('user').style.border = '1px solid #ccc'; // Voltar para a cor padrão
+          }
+            </script>
+        </body>
+        </html>`
+        res.end(conteudo);
+    }
+    else if(req.body.message.length < 1)
+    {
+        conteudo += `<!DOCTYPE html>
+        <html lang="pt">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <link rel="stylesheet" href="batepapo.css">
+            <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+            <title>Zap-Zap</title>
+        </head>
+        <body>
+        
+        
+        
+            <section class="container">
+        
+                <div class="menu">
+        
+                    <a href="/"><img src="zap (1).png" alt="ZAP"></a>
+                </div>
+        
+                <section class="chat">
+                
+                <section class="chat_messages">`
+                for(let message of lista_mensagens)
+                {
+                   for (let colorido of lista_usuarios) {
+                       if (message.usuario === colorido.nickname) {
+                           var pegar = `${colorido.cor}`;
+                           break;
+                       }
+                   }
+                   
+
+                   conteudo +=`
+                   <div class="message">
+                   <span style="color: ${pegar};" class="user">${message.usuario}</span>
+                   
+                                       
+                   ${message.mensagem}<br><br><span class="data">${message.data}</span>
+                   </div>      
+                   `                   
+                }
+
+               
+             conteudo += `</section> 
+        
+                    <form action="/enviarmensagem" method="POST" class="chat_formulario">
+                        <select name="user" id="user" onfocus="removeRedBorder()">
+                            <option value="" disabled selected>Selecione um usuário</option>`
+                        
+                            for(let users of lista_usuarios)
+                            {
+                                conteudo += `<option value="${users.nickname}">${users.nickname}</option>`
+                            }
+
+                        
+                        conteudo +=     `</select>
+                        <input style="background-color: red;" type="text" id="in" class="chat_input" placeholder="Digite uma Mensagem" name="message">
+                        <button type="submit" class="chat_button">
+                            <span class="material-symbols-outlined">
+                                send
+                            </span>
+                        </button>
+        
+                    </form>
+                </section>                
+
+            </section>
+        
+            <script>
+        var obj = document.querySelector('.chat_messages');
+        obj.scrollTop = obj.scrollHeight - obj.clientHeight;
+        
+        function removeRedBorder() {
+            document.getElementById('inc').style.background = '1px solid #ccc'; // Voltar para a cor padrão
           }
             </script>
         </body>
