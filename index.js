@@ -12,11 +12,10 @@ var lista_usuarios = [];
 var lista_mensagens = [];
 var contador_cores = 0;
 
-
-
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(process.cwd(),`src`)));
+app.use(session({secret:"secreta", resave: true, saveUninitialized: true, cookie: {    maxAge: 1000 * 60 * 15     }}));
 
 function autenticar(requisicao, resposta, next){
     if (requisicao.session.usuarioAutenticado){
@@ -26,15 +25,6 @@ function autenticar(requisicao, resposta, next){
         resposta.redirect("/login");
     }
 }
-
-app.use(session({
-    secret:"secreta",
-    resave: true, 
-    saveUninitialized: true,
-    cookie: {
-        maxAge: 1000 * 60 * 15 
-    }
-}));
 
 app.get(`/login`, (req, res) => {
     res.end(`
