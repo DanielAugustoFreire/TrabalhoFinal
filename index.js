@@ -90,10 +90,10 @@ app.get(`/login`, (req, res) => {
         <div class="container">
             <h2>Login</h2>
             <form action="/auth" method="post">
-                <label for="usuario">Usuario:</label>
+                <label for="usuario">Usuario:  (dan)</label>
                 <input type="text" id="usuario" name="usuario" required>
 
-                <label for="senha">Senha:</label>
+                <label for="senha">Senha:  (123)</label>
                 <input type="password" id="senha" name="senha" required>
 
                 <button type="submit">Entrar</button>
